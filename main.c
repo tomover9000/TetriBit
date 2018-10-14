@@ -1,4 +1,6 @@
-// TetriBit
+/*This is TetriBit
+ *
+ * */
 #include <stdio.h>
 #include <math.h>
 
