@@ -21,20 +21,19 @@ void ShowMap(unsigned long long Map) {
 			printf("\n");
 		mask=mask>>1;
 	}
+	printf("\n\n");
 	sleep(1);
-	system("clear");
+//	system("clear");
 	
 }
 
 unsigned long long movedownPiece(unsigned long long Map, int current, int depth) {
 	
 	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
-	current_long=current_long|current;
-	current_long = current_long << (6-depth)*8;
+	current_long = current_long|current;
+	current_long = current_long << (7-depth)*8;
 	
-	ShowMap(current_long);
-
-	if(1) {
+	if((Map&current_long)==0) {
 		Map=Map|current_long;
 		return Map;
 	}else {
@@ -42,26 +41,60 @@ unsigned long long movedownPiece(unsigned long long Map, int current, int depth)
 	}
 }
 
-int shiftPiece(int Piece, int move) {
-	int mask=0b00000000000000001000000000000001;
+int shiftPiece(unsigned long long Map, int current, int move, int depth) {
+	
+	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
+	current_long = current_long|current;
+	current_long = current_long << (7-depth)*8;
+	int mask;
+
 	if(move>0) {
-		while(move!=0 && mask&Piece==0) {
+
+		mask=0b00000000000000000000000000000001;
+
+		while(move!=0 && (mask&current)==0 && ((current_long>>1)&Map)==0) {
+		
 			move--;
-			Piece=Piece>>1;
-		}	
-	}
-	else {
-		while(move!=0 && mask&Piece==0) {
+			current = current>>1;
+			current_long = current_long>>1;
+			//ShowMap(current_long);
+			//sleep(2);
+	
+		}
+	}else {
+		
+  		mask=0b10000000000000000000000000000000;
+	
+		while(move!=0 && (mask&current)==0 && ((current_long<<1)&Map)==0) {
+			
+			printf("%d \n\n\n", mask&current);
+			sleep(5);
+			ShowMap(current_long);
 			move++;
-			Piece=Piece<<1;
+			current = current<<1;
+			current_long = current_long<<1;
+			//ShowMap(current_long);
+			//sleep(2);
+	
 		}
 	}
-	return Piece;
+	return current;
+
+}
+
+unsigned long long addPiece(unsigned long long Map, int current, int depth) {
+	
+	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
+	current_long = current_long|current;
+	current_long = current_long << (7-depth)*8;
+	
+	Map = Map|current_long;
+	return Map;
 }
 
 int main() {
 	
-	unsigned long long Map, Stable_Map;
+	unsigned long long Map, Stable_Map, Prev_Map;
 	int Nr_pieces;
 	int Pieces[10][10];
 
@@ -75,11 +108,24 @@ int main() {
 		}
 	}
 
+
 	for(int i=0; i<Nr_pieces; i++) {
 		for(int j=1; j<9; j++) { 
 
-			Pieces[i][0]= shiftPiece(Pieces[i][0], Pieces[i][j]);
-			Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
+		      	Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
+			printf("move down \n");
+			if(Map) {
+				printf("not 0 \n");
+				ShowMap(Map);
+			}else {
+				ShowMap(Prev_Map);
+				break;
+			}
+
+			Pieces[i][0] = shiftPiece(Stable_Map, Pieces[i][0], Pieces[i][j], j-1);
+			//adding the shifted piece to the Map
+			Map = addPiece(Stable_Map, Pieces[i][0], j-1);
+			Prev_Map = Map;
 			ShowMap(Map);
 
 		}
