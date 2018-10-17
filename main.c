@@ -57,29 +57,21 @@ int shiftPiece(unsigned long long Map, int current, int move, int depth) {
 			move--;
 			current = current>>1;
 			current_long = current_long>>1;
-			//ShowMap(current_long);
-			//sleep(2);
 	
 		}
 	}else {
 		
-  		mask=0b10000000000000000000000000000000;
+  		mask=0b00000000000000001000000000000000;
 	
 		while(move!=0 && (mask&current)==0 && ((current_long<<1)&Map)==0) {
-			
-			printf("%d \n\n\n", mask&current);
-			sleep(5);
-			ShowMap(current_long);
+
 			move++;
 			current = current<<1;
 			current_long = current_long<<1;
-			//ShowMap(current_long);
-			//sleep(2);
 	
 		}
 	}
 	return current;
-
 }
 
 unsigned long long addPiece(unsigned long long Map, int current, int depth) {
@@ -113,9 +105,7 @@ int main() {
 		for(int j=1; j<9; j++) { 
 
 		      	Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
-			printf("move down \n");
 			if(Map) {
-				printf("not 0 \n");
 				ShowMap(Map);
 			}else {
 				ShowMap(Prev_Map);
@@ -129,6 +119,7 @@ int main() {
 			ShowMap(Map);
 
 		}
+		Stable_Map = Prev_Map;
 	}
 
 }
