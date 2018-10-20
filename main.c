@@ -22,9 +22,8 @@ void ShowMap(unsigned long long Map) {
 		mask=mask>>1;
 	}
 	printf("\n\n");
-	sleep(1);
-//	system("clear");
-	
+	sleep(0.3);
+//	system("clear");	
 }
 
 unsigned long long movedownPiece(unsigned long long Map, int current, int depth) {
@@ -84,6 +83,27 @@ unsigned long long addPiece(unsigned long long Map, int current, int depth) {
 	return Map;
 }
 
+unsigned long long removeCompleteLines(unsigned long long Map) {
+	
+	unsigned long long mask=0b1111111111111111111111111111111111111111111111111111111111111111, linechecker=0b0000000000000000000000000000000000000000000000000000000011111111, UpperMap, LowerMap;
+
+	for(int i=0; i<8; i++) {
+
+		if((Map&linechecker)==linechecker) {
+		//Split Map into 2 Maps(upper and lower) 	
+
+			UpperMap = (Map&(mask<<(i+1)*8));
+			LowerMap = (Map&(mask>>(8-i)*8));
+			//shift the upper one down one line so that we lose the line that was complete
+			UpperMap = UpperMap>>8;
+			Map = UpperMap|LowerMap;			
+		}
+		
+		linechecker = linechecker<<8;
+	}
+	return Map;
+}
+
 int main() {
 	
 	unsigned long long Map, Stable_Map, Prev_Map;
@@ -120,6 +140,8 @@ int main() {
 
 		}
 		Stable_Map = Prev_Map;
+		Stable_Map = removeCompleteLines(Stable_Map);
+		ShowMap(Stable_Map);
 	}
 
 }
