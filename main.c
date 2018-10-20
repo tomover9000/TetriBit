@@ -22,8 +22,7 @@ void ShowMap(unsigned long long Map) {
 		mask=mask>>1;
 	}
 	printf("\n\n");
-	sleep(0.3);
-//	system("clear");	
+	sleep(1);
 }
 
 unsigned long long movedownPiece(unsigned long long Map, int current, int depth) {
@@ -86,29 +85,37 @@ unsigned long long addPiece(unsigned long long Map, int current, int depth) {
 unsigned long long removeCompleteLines(unsigned long long Map) {
 	
 	unsigned long long mask=0b1111111111111111111111111111111111111111111111111111111111111111, linechecker=0b0000000000000000000000000000000000000000000000000000000011111111, UpperMap, LowerMap;
-
+	int change=0;
+	
 	for(int i=0; i<8; i++) {
 
 		if((Map&linechecker)==linechecker) {
 		//Split Map into 2 Maps(upper and lower) 	
+			change = 1;
 
 			UpperMap = (Map&(mask<<(i+1)*8));
 			LowerMap = (Map&(mask>>(8-i)*8));
 			//shift the upper one down one line so that we lose the line that was complete
 			UpperMap = UpperMap>>8;
 			Map = UpperMap|LowerMap;			
+			i--;
+		}else {
+			linechecker = linechecker<<8;
 		}
 		
-		linechecker = linechecker<<8;
 	}
-	return Map;
+	
+	if(change)
+		return Map;
+	else
+		return 0;
 }
 
 int main() {
 	
 	unsigned long long Map, Stable_Map, Prev_Map;
 	int Nr_pieces;
-	int Pieces[10][10];
+	int Pieces[10][10], lastPiece;
 
 	scanf("%llu", &Map);
 	scanf("%d", &Nr_pieces);
@@ -124,24 +131,36 @@ int main() {
 	for(int i=0; i<Nr_pieces; i++) {
 		for(int j=1; j<9; j++) { 
 
+			lastPiece = Pieces[i][0];
 		      	Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
 			if(Map) {
 				ShowMap(Map);
 			}else {
-				ShowMap(Prev_Map);
 				break;
 			}
-
+			
 			Pieces[i][0] = shiftPiece(Stable_Map, Pieces[i][0], Pieces[i][j], j-1);
-			//adding the shifted piece to the Map
-			Map = addPiece(Stable_Map, Pieces[i][0], j-1);
-			Prev_Map = Map;
-			ShowMap(Map);
+			
+			if(Pieces[i][0]!=lastPiece) {
+	
+				//adding the shifted piece to the Map if the piece shifted ofc
+			
+				Map = addPiece(Stable_Map, Pieces[i][0], j-1);
+				ShowMap(Map);
+	
+			}
 
+			Prev_Map = Map;
+		
 		}
-		Stable_Map = Prev_Map;
-		Stable_Map = removeCompleteLines(Stable_Map);
-		ShowMap(Stable_Map);
+		Map = removeCompleteLines(Prev_Map);
+		if(Map) {
+			Stable_Map = Map;
+			ShowMap(Map);
+		}else {
+			Stable_Map = Prev_Map;
+		}
+			
 	}
 
 }
