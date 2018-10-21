@@ -132,27 +132,31 @@ int main() {
 		for(int j=1; j<9; j++) { 
 
 			lastPiece = Pieces[i][0];
+			//Display the Map if the current piece moved down
 		      	Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
 			if(Map) {
 				ShowMap(Map);
 			}else {
+				//if the piece cant move down, its movement ends
 				break;
 			}
 			
+			//Display the Map if the current piece shifted
 			Pieces[i][0] = shiftPiece(Stable_Map, Pieces[i][0], Pieces[i][j], j-1);
-			
 			if(Pieces[i][0]!=lastPiece) {
 	
-				//adding the shifted piece to the Map if the piece shifted ofc
+				//adding the shifted piece to the Map if the piece is shifted ofc
 			
 				Map = addPiece(Stable_Map, Pieces[i][0], j-1);
 				ShowMap(Map);
 	
 			}
 
+			//Save the previous Map, you never know when u need it :)
 			Prev_Map = Map;
 		
 		}
+		//display Map again if theres any lines removed
 		Map = removeCompleteLines(Prev_Map);
 		if(Map) {
 			Stable_Map = Map;
