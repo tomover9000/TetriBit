@@ -1,11 +1,11 @@
-/*This is TetriBit
- *
- * */
+//This is TetriBit
 
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
+
+int completedLines = 0;
 
 void ShowMap(unsigned long long Map) {
 
@@ -21,8 +21,8 @@ void ShowMap(unsigned long long Map) {
 			printf("\n");
 		mask=mask>>1;
 	}
-	printf("\n\n");
-	sleep(1);
+	printf("\n");
+//	sleep(1);
 }
 
 unsigned long long movedownPiece(unsigned long long Map, int current, int depth) {
@@ -93,6 +93,8 @@ unsigned long long removeCompleteLines(unsigned long long Map) {
 		//Split Map into 2 Maps(upper and lower) 	
 			change = 1;
 
+			completedLines++;
+
 			UpperMap = (Map&(mask<<(i+1)*8));
 			LowerMap = (Map&(mask>>(8-i)*8));
 			//shift the upper one down one line so that we lose the line that was complete
@@ -111,11 +113,27 @@ unsigned long long removeCompleteLines(unsigned long long Map) {
 		return 0;
 }
 
+int numberOfZeros(unsigned long long Map) {
+	
+	unsigned long long mask = 1;
+	int zeros = 0;
+
+	for(int i = 0; i < 64; i++) {
+		if((Map&mask) == 0) {
+			zeros++;	
+		}
+		mask << 1;
+	}
+
+	return zeros;
+}
+
 int main() {
 	
 	unsigned long long Map, Stable_Map, Prev_Map;
 	int Nr_pieces;
 	int Pieces[10][10], lastPiece;
+	double score = 0;
 
 	scanf("%llu", &Map);
 	scanf("%d", &Nr_pieces);
@@ -165,6 +183,11 @@ int main() {
 			Stable_Map = Prev_Map;
 		}
 			
+		
 	}
+
+	score = sqrt(numberOfZeros(Stable_Map)) + pow(1.25, completedLines);
+
+	printf("GAME OVER! \nScore:%.2f\n", score);
 
 }
