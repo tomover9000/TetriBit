@@ -41,32 +41,43 @@ unsigned long long movedownPiece(unsigned long long Map, int current, int depth)
 
 int shiftPiece(unsigned long long Map, int current, int move, int depth) {
 	
-	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
+	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000, boundries=0;
 	current_long = current_long|current;
 	current_long = current_long << (7-depth)*8;
-	int mask;
 
 	if(move>0) {
 
-		mask=0b00000000000000000000000000000001;
+		boundries = 0b0000000100000001000000010000000100000001000000010000000100000001;
 
-		while(move!=0 && (mask&current)==0 && ((current_long>>1)&Map)==0) {
-		
+		while(move!=0 && (boundries&current_long)==0 && ((current_long>>1)&Map)==0) {
+/*			printf("boundriessss:\n"); 
+
+			ShowMap(boundries&current_long);
+*/
+	
 			move--;
 			current = current>>1;
 			current_long = current_long>>1;
+//			ShowMap(current_long);
 	
 		}
 	}else {
-		
-  		mask=0b00000000000000001000000000000000;
-	
-		while(move!=0 && (mask&current)==0 && ((current_long<<1)&Map)==0) {
 
+		boundries = 0b1000000010000000100000001000000010000000100000001000000010000000;
+
+		while(move!=0 && (boundries&current_long)==0 && ((current_long<<1)&Map)==0) {
+/*			
+			printf("boundriessss:\n"); 
+
+			ShowMap(boundries&current_long);
+*/
 			move++;
 			current = current<<1;
 			current_long = current_long<<1;
-	
+			/*printf("mask&curret =%d\n", mask&current);
+			printf("Moving piece \n"); 
+			ShowMap(current_long);
+*/	
 		}
 	}
 	return current;
@@ -96,9 +107,13 @@ unsigned long long removeCompleteLines(unsigned long long Map) {
 			completedLines++;
 
 			UpperMap = (Map&(mask<<(i+1)*8));
-			LowerMap = (Map&(mask>>(8-i)*8));
-			//shift the upper one down one line so that we lose the line that was complete
-			UpperMap = UpperMap>>8;
+			if(i == 0) {
+				LowerMap = 0;
+			} else {
+				LowerMap = (Map&(mask>>(8-i)*8));
+			}
+			
+			UpperMap = UpperMap >> 8;
 			Map = UpperMap|LowerMap;			
 			i--;
 		}else {
@@ -132,47 +147,45 @@ int main() {
 	
 	unsigned long long Map, Stable_Map, Prev_Map;
 	int Nr_pieces;
-	int Pieces[10][10], lastPiece;
+	int Pieces[50][10], lastPiece, i, j;
 	double score = 0;
 
 	scanf("%llu", &Map);
 	scanf("%d", &Nr_pieces);
 	Stable_Map = Map;
 
-	for(int i=0; i<Nr_pieces; i++) {
+	for(i=0; i<Nr_pieces; i++) {
 		for(int j=0; j<9; j++) {
 			scanf("%d", &Pieces[i][j]);
 		}
 	}
 
+	ShowMap(Map);
 
-	for(int i=0; i<Nr_pieces; i++) {
-		for(int j=1; j<9; j++) { 
+	for(i=0; i<Nr_pieces; i++) {
+//		printf("Piece no %d \n\n", i);
+		for(j=1; j<9; j++) { 
 
 			lastPiece = Pieces[i][0];
-			//Display the Map if the current piece moved down
 		      	Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
-			if(Map) {
-				ShowMap(Map);
-			}else {
-				//if the piece cant move down, its movement ends
+			if(Map == 0) {
+				if((j == 1) || (j == 2 && Pieces[i][0] > 0b0000000011111111)) {
+					ShowMap(Prev_Map);
+					Stable_Map = Prev_Map;
+				}
 				break;
 			}
 			
-			//Display the Map if the current piece shifted
 			Pieces[i][0] = shiftPiece(Stable_Map, Pieces[i][0], Pieces[i][j], j-1);
-			if(Pieces[i][0]!=lastPiece) {
+			Map = addPiece(Stable_Map, Pieces[i][0], j-1);
+			ShowMap(Map);
 	
-				//adding the shifted piece to the Map if the piece is shifted ofc
-			
-				Map = addPiece(Stable_Map, Pieces[i][0], j-1);
-				ShowMap(Map);
-	
-			}
-
 			//Save the previous Map, you never know when u need it :)
 			Prev_Map = Map;
 		
+		}
+		if(j == 1 || (j == 2 && Pieces[i][0] > 0b0000000011111111)) {
+			break;
 		}
 		//display Map again if theres any lines removed
 		Map = removeCompleteLines(Prev_Map);
