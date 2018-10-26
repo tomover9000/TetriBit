@@ -122,7 +122,7 @@ int numberOfZeros(unsigned long long Map) {
 		if((Map&mask) == 0) {
 			zeros++;	
 		}
-		mask << 1;
+		mask = mask << 1;
 	}
 
 	return zeros;
