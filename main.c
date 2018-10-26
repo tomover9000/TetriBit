@@ -155,7 +155,8 @@ int main() {
 
 			lastPiece = Pieces[i][0];
 			//movedown returns 0 if theres a collision
-		    Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
+			Map = movedownPiece(Stable_Map, Pieces[i][0], j-1);
+
 			if(Map == 0) {
 				//show map if there's a part of a piece entering the Map
 				if((j == 1) || (j == 2 && Pieces[i][0] > 0b0000000011111111)) {
@@ -188,6 +189,7 @@ int main() {
 		}
 	}
 
+	//score
 	score = sqrt(numberOfZeros(Stable_Map)) + pow(1.25, completedLines);
 
 	printf("GAME OVER! \nScore:%.2f\n", score);
