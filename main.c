@@ -73,7 +73,7 @@ int shiftPiece(unsigned long long Map, int current, int move, int depth) {
 
 unsigned long long addPiece(unsigned long long Map, int current, int depth) {
 	
-	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
+	unsigned long long current_long=0;
 	current_long = current_long|current;
 	current_long = current_long << (7-depth)*8;
 	
@@ -127,7 +127,6 @@ int numberOfZeros(unsigned long long Map) {
 		}
 		mask = mask << 1;
 	}
-
 	return zeros;
 }
 
