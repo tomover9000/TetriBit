@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <math.h>
+#include <math.h> 
 #include <stdlib.h>
 
 int completedLines = 0;
@@ -22,11 +22,12 @@ void ShowMap(unsigned long long Map) {
 		mask=mask>>1;
 	}
 	printf("\n");
+	sleep(1);
 }
 
 unsigned long long movedownPiece(unsigned long long Map, int current, int depth) {
 	
-	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000;
+	unsigned long long current_long=0;
 	current_long = current_long|current;
 	current_long = current_long << (7-depth)*8;
 	
@@ -40,7 +41,7 @@ unsigned long long movedownPiece(unsigned long long Map, int current, int depth)
 
 int shiftPiece(unsigned long long Map, int current, int move, int depth) {
 	
-	unsigned long long current_long=0b0000000000000000000000000000000000000000000000000000000000000000, boundries=0;
+	unsigned long long current_long=0, boundries=0;
 	current_long = current_long|current;
 	current_long = current_long << (7-depth)*8;
 
